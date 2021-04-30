@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body{
+            width: fit-content;
+            height: fit-content;
+            background-color: black;
+            color: white;
+            font-family: Tahoma, sans-serif;
+        }
+        h1{
+            font-size: large;
+        }
+        p1 {
+            font-size: smaller;
+        }
+        p2, p3{
+            font-family: Arial Narrow, sans-serif;
+            font-size: 1.5em;
+        }
+        p3 {
+            font-size: 3em;
+        }
+        .icon {
+            width: 25px;
+            height: 25px;
+            flex: 0;
+        }
+        .bar {
+            width: 36px;
+            margin-left: 2px;
+            margin-right: 2px;
+            background-color: lightblue;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+        .forecast {
+            margin-left: 5px;
+            border-style: ridge;
+            width: fit-content;
+            padding: 5px;
+            min-width: 40px;
+        }
+    </style>
+    <script src="raining_cloud.js"></script>
+</head>
+<body>
+    <h1>Wetter Musterstadt</h1>
+    <p1 style="display: block;">Donnerstag, 01.01.1999</p1>
+    
+    <div style="display: flex; width: fit-content; height: fit-content;">
+        <div style="flex: 0; padding-top: 20px;">
+            <!-- <img src="images/sonne.jpg" width="150"> -->
+            <rain-cloud></rain-cloud>
+        </div>
+
+        <div id="right" style="flex: 1; margin-left: 10px;">
+            <div id="temperature" style="width: fit-content; line-height: 3em;">
+                <p2>-3</p2>
+                <p3 style="vertical-align:top; margin-left: 8px; margin-right: 8px;">22<span style="vertical-align:bottom; font-size: 0.5em; line-height: 3em;">&#8451;</span></p3>
+                <p2>40</p2>
+            </div>
+            <div style="display: flex; height: fit-content; margin-top: 10px;">
+                <img class ="icon" src="images/icon_info.jpg" style="float: left;">
+                <p id="description" style="flex: 1; margin: auto; margin-left: 5px; white-space: nowrap;">Super sonnige Wolken</p>
+            </div>
+            
+            <div id="rain" style="margin-top: 20px; width: fit-content; height: fit-content;">
+                <div style="width: 100%; font-size: 0.8em;"><span id="now">11:00</span><span id="until" style="float: right;">22:00</span></div>
+                <div style="width: 200px; height: 2px; background-color: lightblue; margin-bottom: 2px;"></div>
+                <div id="bars" style="display: flex; width: 200px; height: 130px; text-align: center; font-size: 0.8em;">
+                    <div id="bar1">
+                        <div class="bar" style="height: 0px;"></div>
+                        <div>0%</div>
+                    </div>
+
+                    <div id="bar2">
+                        <div class="bar" style="height: 83px;"></div>
+                        <div>83%</div>
+                    </div>
+
+                    <div id="bar3">
+                        <div class="bar" style="height: 11px;"></div>
+                        <div>11%</div>
+                    </div>
+
+                    <div id="bar4">
+                        <div class="bar" style="height: 98px;"></div>
+                        <div>98%</div>
+                    </div>
+
+                    <div id="bar5">
+                        <div class="bar" style="height: 32px;"></div>
+                        <div>32%</div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+    </div>
+
+    <div id="forecast" style="display: flex;">
+        <div id="dayn+1" class="forecast">
+            <div style="text-align: center; margin-bottom: 3px;">Di</div>
+            <img src="images/sonne.jpg" width="50px">
+            <div style="width: 100%;"><span id="min">1</span> <span id="max" style="float: right;">12</span></div>
+        </div>
+
+        <div id="dayn+2" class="forecast">
+            <div style="text-align: center; margin-bottom: 3px;">Mi</div>
+            <img src="images/sonne.jpg" width="50px">
+            <div style="width: 100%;"><span id="min">6</span> <span id="max" style="float: right;">9</span></div>
+        </div>
+
+        <div id="dayn+3" class="forecast">
+            <div style="text-align: center; margin-bottom: 3px;">Do</div>
+            <img src="images/sonne.jpg" width="50px">
+            <div style="width: 100%;"><span id="min">12</span> <span id="max" style="float: right;">31</span></div>
+        </div>
+
+        <div id="dayn+4" class="forecast">
+            <div style="text-align: center; margin-bottom: 3px;">Fr</div>
+            <img src="images/sonne.jpg" width="50px">
+            <div style="width: 100%;"><span id="min">-5</span> <span id="max" style="float: right;">8</span></div>
+        </div>
+    </div>
+
+</body>
+<!-- <script>
+
+    var time=document.createElement("p");
+    time.textContent="Time: "+new Date().getSeconds();
+    document.getElementsByTagName("body")[0].appendChild(time);
+
+    document.getElementsByTagName("body")[0].onload=function(){
+        var h = document.documentElement.scrollHeight;
+        var w = document.documentElement.scrollWidth;
+        var dto ={height: h, width: w, expirationTimeSec: 15}; 
+        parent.postMessage(dto,"*");
+    }
+</script> -->
+</html>
