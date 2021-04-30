@@ -21,7 +21,7 @@
 
 <h2>Api call:</h2>
 <div style="border: 2px solid black; width: fit-content; background-color: cornsilk; padding: 5px; border-radius: 3px;">
-    <p style="margin: 0; font-size: 1.2em;"><span id="hostname"></span>weather/weather.html?key=<span style="color: tomato;">{api key}</span>&lon=<span style="color: tomato;">{longitude}</span>&lat=<span style="color: tomato;">{longitude}</span></p>
+    <p style="margin: 0; font-size: 1.2em;"><span id="hostname"></span>weather.html?key=<span style="color: tomato;">{api key}</span>&lon=<span style="color: tomato;">{longitude}</span>&lat=<span style="color: tomato;">{longitude}</span></p>
 </div>
 <h2>Explanation</h2>
 <table>
@@ -62,5 +62,5 @@
 </table>
 
 <script>
-    document.getElementById("hostname").textContent = window.location.protocol + "//" + window.location.hostname+ "/";
+    document.getElementById("hostname").textContent = window.location.href.slice(0, window.location.href.lastIndexOf('/')) +"/"
 </script>
