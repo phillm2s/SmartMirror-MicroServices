@@ -11,7 +11,7 @@ function allInOneForecast(latitude, longitude, apiKey) {
 }
 
 function getCoordinatesFromCityName(cityName, apiKey) {
-    var url = "http://api.openweathermap.org/geo/1.0/direct"+
+    var url = "https://api.openweathermap.org/geo/1.0/direct"+
         "?q=" +  cityName +
         "&limit=1" + 
         "&appid=" +apiKey;
