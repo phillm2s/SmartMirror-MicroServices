@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <style>
+            body{
+                background-color: black;
+                color: white;
+            }
+            #time{
+                font-family: Garamond, serif;
+                font-size: 500%;
+                margin: 0;
+            }
+            #date{
+                font-family: Garamond, serif;
+                font-size: 150%;
+                margin: 0;
+                margin-top: 8px;
+            }
+        </style>
+    </head>
+    <body>
+        <p id="time">00:00:00</p>
+        <p id="date">Montag, März 16</p>
+    </body>
+    <script>
+        var timeNode = document.getElementById("time");
+        var dateNode = document.getElementById("date");
+        setInterval(update, 1000);
+
+        function update(){
+            var date = new Date();
+            var s = date.getSeconds();
+            var m = date.getMinutes();
+            var h = date.getHours();
+            timeNode.textContent = 
+                ("0" + h).substr(-2) + ":" + ("0" + m).substr(-2) + ":" + ("0" + s).substr(-2);
+
+            dateNode.textContent = date.toLocaleDateString("de-DE",
+            {weekday: 'long', month: 'long', day: 'numeric' });
+        };
+
+        document.body.onload = (()=>{
+            var h = document.documentElement.scrollHeight;
+            var w = document.documentElement.scrollWidth;
+            var dto ={height: h, width: w};
+            console.log("rezise: ");
+            console.log(dto);
+            parent.postMessage(dto,"*");
+        });
+
+    
+
+    </script>
+</html>

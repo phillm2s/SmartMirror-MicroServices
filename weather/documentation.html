@@ -21,53 +21,9 @@
 
 <h2>Api call:</h2>
 
-<p style="margin-bottom: 1px;">Call by coorsinates: </p>
 <div style="border: 2px solid black; width: fit-content; background-color: cornsilk; padding: 5px; border-radius: 3px;">
-    <p style="margin: 0; font-size: 1.2em;"><span class="hostname"></span>weather.html?key=<span style="color: tomato;">{api key}</span>&lon=<span style="color: tomato;">{longitude}</span>&lat=<span style="color: tomato;">{longitude}</span></p>
+    <p style="margin: 0; font-size: 1.2em;"><span class="hostname"></span>time.html</p>
 </div>
-
-<p style="margin-bottom: 1px; margin-top: 10px;">Call by city name: </p>
-<div style="border: 2px solid black; width: fit-content; background-color: cornsilk; padding: 5px; border-radius: 3px;">
-    <p style="margin: 0; font-size: 1.2em;"><span class="hostname"></span>weather.html?key=<span style="color: tomato;">{api key}</span>&city=<span style="color: tomato;">{city name}</span></p>
-</div>
-<h2>Explanation</h2>
-<table>
-    <tr>
-        <th>Variable name</th>
-        <th>Explanation</th>
-        <th>Example</th>
-    </tr>
-    <tr>
-        <td>key</td>
-        <td>an verification API key</td>
-        <td>29hk234734503h45</td>
-    </tr>
-    <tr>
-        <td colspan ="3" style="padding: 1; background-color: cornsilk;"><b>Chose one from the following options</b></td>
-    </tr>
-    <tr>
-        <td colspan ="3" style="padding: 1; padding-left: 8px; background-color: cornsilk;">Option 1: coordinates</td>
-    </tr>
-    <tr>
-        <td>lon</td>
-        <td>The longitude of the interested weather area</td>
-        <td>for Bonn: 7.09</td>
-    </tr>
-    <tr>
-        <td>lat</td>
-        <td>The latitude of the interested weather area</td>
-        <td>for Bonn: 50.73</td>
-    </tr>
-    <tr>
-        <td colspan ="3" style="padding: 1; padding-left: 8px; background-color: cornsilk;">Option 2: city name</td>
-    </tr>
-    <tr>
-        <td>city</td>
-        <td>Name of the city. To make sure its the right one add the country ID (optional)</td>
-        <td>Bonn <b>or</b> Bonn,DE</td>
-    </tr>
-</table>
-
 <script>
     var url = window.location.href.slice(0, window.location.href.lastIndexOf('/')) +"/";
     
