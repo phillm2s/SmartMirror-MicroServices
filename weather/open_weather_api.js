@@ -1,5 +1,3 @@
-//Bonn: lat=50.73, lon=7.09
-
 function allInOneForecast(latitude, longitude, apiKey) {
     var url = "https://api.openweathermap.org/data/2.5/onecall"+
         "?lat=" + latitude +
