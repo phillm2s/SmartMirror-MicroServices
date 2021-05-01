@@ -118,6 +118,7 @@
 
 </body>
 <script src="open_weather_api.js"></script>
+<script src="./../iframeParentCallback.js"></script>
 <script>
     function loadImage(imgElement, name) { //without file extention
         //try hierarch first gif then png
@@ -242,21 +243,11 @@
                 // </div>
             }
 
-            reziseClient();
+            sendCallback({expirationTimeSec: 30*60});
         }).
         catch((error) => {//todo: exception handling
             console.log(error);
         });
-    }
-
-
-    function reziseClient(){
-        var h = document.documentElement.scrollHeight;
-        var w = document.documentElement.scrollWidth;
-        var dto ={height: h, width: w, expirationTimeSec: 30*60};
-        console.log("rezise: ");
-        console.log(dto);
-        parent.postMessage(dto,"*");
     }
 </script>
 </html>

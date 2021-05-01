@@ -22,6 +22,7 @@
         <p id="time">00:00:00</p>
         <p id="date">Montag, März 16</p>
     </body>
+    <script src="./../iframeParentCallback.js"></script>
     <script>
         var timeNode = document.getElementById("time");
         var dateNode = document.getElementById("date");
@@ -40,10 +41,7 @@
         };
 
         document.body.onload = (()=>{
-            var h = document.documentElement.scrollHeight;
-            var w = document.documentElement.scrollWidth;
-            var dto ={height: h, width: w};
-            parent.postMessage(dto,"*");
+            sendCallback();
         });
 
     
