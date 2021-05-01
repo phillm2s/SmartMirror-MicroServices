@@ -43,8 +43,6 @@
             var h = document.documentElement.scrollHeight;
             var w = document.documentElement.scrollWidth;
             var dto ={height: h, width: w};
-            console.log("rezise: ");
-            console.log(dto);
             parent.postMessage(dto,"*");
         });
 
