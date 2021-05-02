@@ -46,7 +46,7 @@
     <script src="raining_cloud.js"></script>
 </head>
 <body>
-    <h1>Wetter</h1> 
+    <h1 id="headline">Wetter</h1> 
     <p1 id="current_time" style="display: block; border-bottom: 10px">xxTag, ??.??.????</p1>
     
     <div style="display: flex; width: fit-content; height: fit-content;">
@@ -154,7 +154,7 @@
     if (apiKey==null) {window.location.replace("./../invalidApiKey.html");}
     
     if ((latitude && longitude) != null){
-        updateDom(latitude, longitude, apiKey);
+        updateWeather(latitude, longitude, apiKey);
     } else if(city != null){
         getCoordinatesFromCityName(city,apiKey)
         .then(response => response.json())
@@ -162,9 +162,9 @@
             console.log(data);
             latitude = data[0].lat;
             longitude = data[0].lon;
-            updateDom(latitude, longitude, apiKey);
+            updateWeather(latitude, longitude, apiKey);
         })
-        .catch((error) => {//todo: exception handling
+        .catch((error) => {
             console.log(error);
         });
     }
@@ -172,12 +172,14 @@
     else {window.location.replace("./../wrongParameters.html");}
         
 
-    function updateDom(latitude, longitude, apiKey){
+    function updateWeather(latitude, longitude, apiKey){
         allInOneForecast(latitude, longitude, apiKey)
         .then(response => response.json())
         .then(data => {
             console.log(data)
             if (data.cod !=null && data.cod == 401) { window.location.replace("./../invalidApiKey.html");}
+
+            updateValue("headline", (city || "Wetter") );
 
             let tos = 0;//data.timezone_offset; //no offset needed? //api gets time in seconds instead millis
             currentTimeInMillis = (data["current"].dt + tos)*1000 
