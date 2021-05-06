@@ -127,10 +127,8 @@
         imgElement.onerror = (()=>{
             if (last == false) {
                 last=true;
-                console.log("no gif available -> load png")
                 imgElement.src= name + ".png";
             } else {
-                console.log("no img available")
                 imgElement.parentNode.removeChild(imgElement);
             }
         });
@@ -159,7 +157,6 @@
         getCoordinatesFromCityName(city,apiKey)
         .then(response => response.json())
         .then(data => {
-            console.log(data);
             latitude = data[0].lat;
             longitude = data[0].lon;
             updateWeather(latitude, longitude, apiKey);
@@ -176,7 +173,6 @@
         allInOneForecast(latitude, longitude, apiKey)
         .then(response => response.json())
         .then(data => {
-            console.log(data)
             if (data.cod !=null && data.cod == 401) { window.location.replace("./../invalidApiKey.html");}
 
             updateValue("headline", (city || "Wetter") );
