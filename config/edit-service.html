@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Edit-Service</title>
+        <link rel="stylesheet" href="./config.css">
+        <style>
+
+        </style>
+    </head>
+    <body>
+        <div id="header">
+            <div style="font-size: 4em; margin: auto; margin-left: 2em;">Edit-Service</div>
+        </div>
+        <div>
+            <div id="edit-div" class="edit-div">
+                <textarea id="text-field" class="text-field">emty</textarea>
+                <button id="save" class="button2">Save Changes</button>
+                <button id="leave" style="float: right;" class="button2">discard Changes</button>
+            </div>
+        </div>
+
+        <div id="footer"></div>
+    </body>
+    <script src="./../helper.js"></script>
+    <script>
+        document.getElementById("leave").addEventListener("click",()=>{
+            window.location.href="./my-services.html"
+        });
+
+        // get 'get' parameter from url
+        var queryDict = {}
+        location.search.substr(1).split("&").forEach(function(item) {queryDict[item.split("=")[0]] = item.split("=")[1]})
+        var json;
+        fetch("./../config.json")
+        .then((response) => response.json())
+        .then((data) => {
+            json = data;
+            var service = data.services[queryDict.index];
+            document.getElementById("text-field").value = JSON.stringify(service, null, 4);
+        });
+
+        document.getElementById("save").addEventListener("click",()=>{
+            blockView();
+
+            //check if json string is valid
+            var jsonString = document.getElementById("text-field").value;
+            try{
+                var jsonService = JSON.parse(jsonString);
+            } catch (e){
+                window.alert("no valid json!");
+                throw e;
+            }
+
+            //override old service
+            json.services[queryDict.index] = jsonService;
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    unblockView();
+                    //go back to my services page
+                    window.alert("Service Updatd")
+                    window.location.href="./my-services.html"
+                }
+            };
+            xhttp.open("POST", "/update-service", true);
+            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhttp.send(JSON.stringify(json));
+        });
+
+
+    </script>
+</html>

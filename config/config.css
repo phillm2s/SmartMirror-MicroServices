@@ -1,0 +1,71 @@
+/* Mobile first */
+/* https://material.io/design/color/dark-theme.html#ui-application */
+/* https://www.youtube.com/watch?v=yH7gkUNwDJY&ab_channel=dcode */
+ :root { 
+    --color-bg1: #121212;
+    --color-bg2: #1f1f1f;
+
+    --color-fg1: #eee;
+    --color-fg2: #bdbdbd;
+
+    --color-special1: #03dac6;
+    --color-special2: #bb86fc;
+ }
+
+body, html {
+    margin: 0;
+    background-color: var(--color-bg1);
+    color: var(--color-fg2);
+    height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+#header {
+    display: flex;
+    background-color: var(--color-bg2);
+    width: 100%;
+    min-height: 7em;
+}
+
+.edit-div {
+    margin: auto;
+    margin-top: 2em;
+    width: 80%;
+}
+
+.text-field {
+    overflow-x: scroll;
+    min-height: 5em;
+    height: 70vh;
+    width: 100%;
+    font-size: 2.5em;
+    border-radius: 8px;
+    resize: none;
+    white-space: nowrap;
+    border: 0;
+    background-color: var(--color-bg2);
+    color: var(--color-special2);
+}
+
+.button2 {
+    font-size: 2.5em;
+    padding: 0.5em;
+    border-radius: 7px;
+    background-color: var(--color-special2);
+    border: none;
+    margin-top: 2em;
+}
+.button2:hover {
+    background-color: var(--color-special1)
+}
+
+.button1:hover {
+    background-color: var(--color-special2);
+}
+
+.button1:active {
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+}

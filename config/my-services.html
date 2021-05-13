@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        #service-list {
+            margin-top: 8em;
+        }
+
+        .service-div {
+            display: flex;
+            min-height: 2em;
+            background-color: var(--color-bg2);
+            border-radius: 5px;
+            margin: 2em;
+        }
+
+        .name-span {
+            margin: auto;
+            margin-left: 2em;
+            margin-top: 1em;
+            margin-bottom: 1em;
+            font-size: 3em;
+            font-weight: bold;
+            display: inline-block;
+        }
+    </style>
+    <title>My-Services</title>
+    <link rel="stylesheet" href="./config.css">
+</head>
+
+<body>
+    <div id="header">
+        <div style="font-size: 4em; margin: auto; margin-left: 2em;">My-Services</div>
+    </div>
+    <div id="service-list">
+
+    </div>
+
+    <div id="footer"></div>
+</body>
+<script src="./../helper.js"></script>
+<script>
+
+    var addServiceButton = function(serviceListDiv, serviceIndex, serviceJson) {
+        var serviceDiv = document.createElement("div")
+        serviceListDiv.appendChild(serviceDiv);
+        serviceDiv.className = "button1 service-div";
+
+        var clickDiv = document.createElement("div");
+        serviceDiv.appendChild(clickDiv);
+        clickDiv.style.width = "100%";
+        clickDiv.addEventListener("click", () => { editService(serviceIndex) });
+
+
+        var nameSpan = document.createElement("span");
+        nameSpan.className = "name-span";
+        nameSpan.textContent = serviceJson.name;
+        clickDiv.appendChild(nameSpan);
+
+        return serviceDiv;
+    };
+        
+    var addDeleteFunction = function(buttonDiv, serviceIndex, configJson) {
+        var deleteSpan = document.createElement("span");
+        buttonDiv.appendChild(deleteSpan);
+        deleteSpan.textContent = "Delete";
+        deleteSpan.style.color = "red";
+        deleteSpan.style.fontSize = "2em"
+        deleteSpan.style.margin = "auto";
+        deleteSpan.style.float = "left";
+        deleteSpan.style.padding = "1em";
+        deleteSpan.style.marginRight = "1em";
+        deleteSpan.addEventListener("click", () => {
+            blockView();
+            configJson.services.splice(serviceIndex,1);
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    unblockView();
+                    //go back to my services page
+                    window.alert("Service Deleted")
+                    location.reload();
+                }
+            };
+            xhttp.open("POST", "/update-service", true);
+            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhttp.send(JSON.stringify(configJson));
+        });
+    }
+
+    var addNewButton = function(serviceListDiv) {    
+        var serviceDiv = document.createElement("div")
+        serviceDiv.className = "button1 service-div";
+        serviceDiv.addEventListener("click", () => {
+            window.location.href = "./new-service.html";
+        });
+        serviceDiv.style.marginTop = "3em";
+        serviceListDiv.appendChild(serviceDiv);
+
+        var nameSpan = document.createElement("span");
+        nameSpan.className = "name-span";
+        nameSpan.textContent = "New";
+        nameSpan.style.color = "var(--color-special1)";
+        serviceDiv.appendChild(nameSpan);
+    };
+
+    var editService = function (index) {
+        window.location.href = "./edit-service.html?index=" + index;
+    };
+
+
+
+    var serviceList = document.getElementById("service-list");
+    fetch("./../config.json")
+        .then((response) => response.json())
+        .then((data) => {
+            console.log("Load Service Configurations");
+
+            var serviceListDiv = document.getElementById("service-list");
+            data.services?.forEach((service, index) => {
+                console.log("loaded config: '" + service.name + "' with data: ");
+                console.log(service);
+                var serviceDiv = addServiceButton(serviceListDiv, index, service);
+                addDeleteFunction(serviceDiv, index, data);
+            });
+            addNewButton(serviceListDiv);
+        });
+    
+
+
+
+</script>
+
+</html>

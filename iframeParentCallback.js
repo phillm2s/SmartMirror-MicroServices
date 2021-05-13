@@ -1,5 +1,5 @@
 
-function sendCallback(optionalParameter ={}){
+function sendSucessfullLoadedCallback(optionalParameter ={}){
 
     var dto ={
         height: document.documentElement.scrollHeight,

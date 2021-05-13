@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Mirror-Configurator</title>
+        <link rel="stylesheet" href="./config.css">
+    </head>
+    <body>
+        <div id="header">
+            <div style="font-size: 4em; margin: auto; margin-left: 2em;">Mirror-Configurator</div>
+        </div>
+        <div>
+            <div id="edit-div" class="edit-div">
+                <!-- template -->
+                <textarea id="text-field" class="text-field">
+{
+    "name": "XX",
+    "url": "https://phillm2s.github.io/SmartMirror-MicroServices/XXX.html",
+    "method": "get",
+    "position": {
+        "top": "30%",
+        "left": "50px",
+        "height": "500px",
+        "width": "550px"
+    },
+    "parameter": {
+        "XY": "XX"
+    }
+}
+                </textarea>
+                <button id="add" class="button2">Add Service</button>
+                <button id="leave" style="float: right;" class="button2">Leave And Discard</button>
+            </div>
+        </div>
+
+        <div id="footer"></div>
+    </body>
+    <script src="./../helper.js"></script>
+    <script>
+        document.getElementById("leave").addEventListener("click",()=>{
+            window.location.href="./my-services.html"
+        });
+
+        document.getElementById("add").addEventListener("click",()=>{
+            blockView();
+
+            //check if json string is valid
+            var jsonString = document.getElementById("text-field").value;
+            try{
+                var jsonService = JSON.parse(jsonString);
+            } catch (e){
+                window.alert("no valid json!");
+                unblockView();
+                throw e;
+            }
+
+            fetch("./../config.json")
+            .then((response) => response.json())
+            .then((data) => {
+                var json = data;
+                json.services.push(jsonService);
+
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    unblockView();
+                    //go back to my services page
+                    window.alert("Service Updatd")
+                    window.location.href="./my-services.html"
+                }
+                };
+                xhttp.open("POST", "/update-service", true);
+                xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                xhttp.send(JSON.stringify(json));
+                });
+        });
+
+    </script>
+</html>
