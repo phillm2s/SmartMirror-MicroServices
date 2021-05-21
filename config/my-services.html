@@ -110,22 +110,27 @@
     };
 
 
+    window.addEventListener("message",(message)=>{
+        console.log(message.data);
+    });
+    // request config file on loading page via iframe parent delegation
+    parent.postMessage("","*");
 
-    var serviceList = document.getElementById("service-list");
-    fetch("./../config.json")
-        .then((response) => response.json())
-        .then((data) => {
-            console.log("Load Service Configurations");
+    // var serviceList = document.getElementById("service-list");
+    // fetch("./../config.json")
+    //     .then((response) => response.json())
+    //     .then((data) => {
+    //         console.log("Load Service Configurations");
 
-            var serviceListDiv = document.getElementById("service-list");
-            data.services?.forEach((service, index) => {
-                console.log("loaded config: '" + service.name + "' with data: ");
-                console.log(service);
-                var serviceDiv = addServiceButton(serviceListDiv, index, service);
-                addDeleteFunction(serviceDiv, index, data);
-            });
-            addNewButton(serviceListDiv);
-        });
+    //         var serviceListDiv = document.getElementById("service-list");
+    //         data.services?.forEach((service, index) => {
+    //             console.log("loaded config: '" + service.name + "' with data: ");
+    //             console.log(service);
+    //             var serviceDiv = addServiceButton(serviceListDiv, index, service);
+    //             addDeleteFunction(serviceDiv, index, data);
+    //         });
+    //         addNewButton(serviceListDiv);
+    //     });
     
 
 
