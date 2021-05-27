@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+                background-color: black;
+                color: white;
+                font-family: Tahoma, sans-serif;
+                width: fit-content;
+                height: fit-content;
+            }
+            #corona-wrapp {
+                display: flex;
+                flex-direction: column;
+            }
+            .box {
+                margin: 1em;
+            }
+            .chart {
+                margin-top: 1em;
+                margin-bottom: 1em;
+            }
+            .default-font {
+                font-size: 1em;
+            }
+            h2 {
+                font-size: 1.5em;
+                margin-top: 0.2em;
+                margin-bottom: 0.2em;
+            }
+            h1 {
+                margin: 0;
+                font-size: 2em;
+                display: inline-block;
+            }
+            #corona-icon {
+                margin-left: 1em;
+                width: 3em;
+                height: 3em;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div style="display: flex; align-items: center;">
+            <h1>Corona Dashboard</h1> <img id="corona-icon" src="img/coronaIcon.png">
+        </div>
+        <div id="corona-wrapp">
+
+            <div id="cases-div" class="box">
+                    <h2 style="margin-bottom: 0;">Infektionsverlauf</h2>
+                    <div style="margin-top: 0" id="cases-chart" class="chart"></div>
+            </div>
+
+            <div id="vaccine-div" class="box">
+                <h2>Impffortschritt</h2>
+                <div id="vaccine-pie" class="chart"></div>
+                <div class="default-font"> <span>Imfungen Heute:</span> <span id="todays-progress" style="margin-left: 1em;">?</span> </div>
+            </div>
+
+        </div>
+    </body>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        var urlParams = new URLSearchParams(window.location.search);
+        var incidenceForLastxDays = urlParams.get("days") | 180;
+
+        (async ()=> {
+            try{
+                var response = await fetch('https://api.corona-zahlen.org/germany/history/incidence/'+incidenceForLastxDays);
+                response = await response.json();
+
+                displayCases(response);
+            }catch(e){
+                console.log(e);
+            }
+            try{
+                Promise.allSettled(
+                    [fetch('https://api.corona-zahlen.org/vaccinations').then((responseA) => responseA.json()),
+                    fetch('https://api.corona-zahlen.org/germany').then((responseB) => responseB.json())])
+                    .then((bothResponses) => {
+                        displayVaccine({
+                            vaccinations: bothResponses[0].value,
+                            overview: bothResponses[1].value
+                        });
+                    });
+            }catch(e){
+                console.log(e);
+            }
+        })();
+
+        async function displayCases(data) {
+            const monthNames = [
+                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            var days = data.data;
+            var chartDataPoints = [];
+            var ticks = []; //intervals for x axis
+            var currentMont = days[0].date.substring(5,7);
+            for (let i=0; i< days.length;i++){
+                var weekIncidence = Math.round(days[i].weekIncidence);
+                if (currentMont != days[i].date.substring(5,7)){
+                    currentMont = days[i].date.substring(5,7);
+                    ticks.push({v: i, f: monthNames[parseInt(currentMont)-1]});
+                }
+                chartDataPoints.push( [i+1, weekIncidence, "Heute: " + weekIncidence ] );
+            }
+            displayLineChart(document.getElementById("cases-chart"), chartDataPoints, ticks);
+        }
+        
+        async function displayVaccine(data) {
+            var overview = data.overview;
+            var vaccinations = data.vaccinations;
+            var vaccineDiv = document.getElementById("vaccine-div");
+
+            var erstimpfung = vaccinations.data.vaccinated - vaccinations.data.secondVaccination.vaccinated;
+            var zweitimpfung = vaccinations.data.secondVaccination.vaccinated;
+            var rest = 83000000 - erstimpfung - zweitimpfung;
+            
+            var content = [
+                ['Task', ''],
+                ['Zweit-Impfung', zweitimpfung],
+                ['(nur)Erst-Impfung', erstimpfung],
+                ['Genesen', overview?.recovered | 0],
+                ['Rest', rest]];
+            var bgColors= ['#a3ba49', '#d6ebc4', '#fddb85', '#f56260'];
+            var renderDiv = document.getElementById("vaccine-pie");
+            displayPieChart(content, bgColors, renderDiv);
+
+            //new vaccations since yesterday
+            var vaccineToday = vaccinations.data.delta + vaccinations.data.secondVaccination.delta;
+            document.getElementById("todays-progress").textContent = "+" + vaccineToday.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function displayPieChart(content, bgColors, div){
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.setOnLoadCallback(drawChart);
+            // Draw the chart and set the chart values
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable(content);
+
+                var options = {
+                    colors: bgColors,
+                    slices: {1: {textStyle: {color: 'black'}}}, //only
+                    chartArea: {left:0, top:0, width:"100%", height:"100%"},
+                    width: 400,
+                    height: 250,
+                    backgroundColor: 'black',
+                    titleTextStyle: {
+                        color: 'white'
+                    },
+                    legend: {
+                        textStyle: {
+                            color: 'white'
+                        },
+                        position: 'labeled'
+                    },
+                    pieSliceText: 'value',
+                    sliceVisibilityThreshold :0.01,
+                    fontSize: 12,
+                };
+                
+                var chart = new google.visualization.PieChart(div);
+                chart.draw(data, options);
+            }
+        }
+    
+        function displayLineChart(div, points, ticks=null) {
+            google.charts.load('current', {packages: ['corechart', 'line']});
+            google.charts.setOnLoadCallback(drawCurveTypes);
+            function drawCurveTypes() {
+                var data = new google.visualization.DataTable();
+                data.addColumn('number', 'X');
+                data.addColumn('number', 'Stand Heute'); // invisible
+                
+                data.addColumn({type: 'string', role: 'tooltip'}); // only needed for tooltip
+
+                data.addRows(points);
+
+                var options = {
+                    width: 600,
+                    height: 250,
+                    colors: ['red'],
+                    backgroundColor: 'black',
+                    hAxis: {
+                        title: 'Tage',
+                        titleTextStyle: {
+                            color: 'white'
+                        },
+                        textStyle: {
+                            color: 'white'
+                        },
+                        baselineColor: 'green',
+                        ticks: ticks
+                    },
+                    vAxis: {
+                        title: 'Inzidenz',
+                        titleTextStyle: {
+                            color: 'white'
+                        },
+                        textStyle: {
+                            color: 'white'
+                        },
+                        baselineColor: 'white'
+                    },
+                    legend: {
+                        position: 'none'
+                    },
+                    series: {
+                        1: {curveType: 'function'}
+                    },
+                    tooltip:{trigger:'selection'},
+                    focusTarget: 'category'
+                };
+
+                var chart = new google.visualization.LineChart(div);
+                google.visualization.events.addListener(chart, 'ready', ()=>{
+                    chart.setSelection([{row: points.length-1, column: 1}]);
+                });
+                chart.draw(data, options);
+                }
+        }
+    
+    </script>
+</html>

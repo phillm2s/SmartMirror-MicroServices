@@ -1,0 +1,51 @@
+
+<head>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            max-width: 40%;
+            border-radius: 5px;
+        }
+        td, th {
+            border: 3px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+    </style>
+</head>
+
+<h1>
+    documentation
+</h1>
+
+<h2>Api call:</h2>
+
+<p style="margin-bottom: 1px;">Call by coorsinates: </p>
+<div style="border: 2px solid black; width: fit-content; background-color: cornsilk; padding: 5px; border-radius: 3px;">
+    <p style="margin: 0; font-size: 1.2em;"><span class="hostname"></span>corona.html?days=<span style="color: tomato;">{days}</span></p>
+</div>
+
+
+<h2>Explanation</h2>
+<table>
+    <tr>
+        <th>Variable name</th>
+        <th>Explanation</th>
+        <th>Example</th>
+    </tr>
+    <tr>
+        <td>days</td>
+        <td>The number of past days to show on line diagram. 180 is default</td>
+        <td>360</td>
+    </tr>
+</table>
+
+<script>
+    var url = window.location.href.slice(0, window.location.href.lastIndexOf('/')) +"/";
+    
+    var hns= document.getElementsByClassName("hostname");
+    for (let i=0 ; i< hns.length; i++) {
+        hns[i].innerText=url;
+    };
+</script>

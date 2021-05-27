@@ -2,13 +2,39 @@
 <html>
     <head>
         <title>Mirror-Configurator</title>
-        <link rel="stylesheet" href="./config.css">
+        <link rel="stylesheet" href="config.css">
     </head>
+    <script src="components/my-services/my-services.js"></script>
+    <script src="helper.js"></script>
     <body>
         <div id="header">
             <div style="font-size: 4em; margin: auto; margin-left: 2em;">Mirror-Configurator</div>
         </div>
-        <button style="font-size: 3em;" onclick="window.location.href='my-services.html'">my-services</button>
-        <div id="footer"></div>
     </body>
+    <script>
+
+        //load the mirror configuration
+        loadDeviceUrl(forceReload=true)
+        .then(url => loadConfig(url, foreceReload=true))
+        .then(configJson => {
+            var myServices = document.createElement("my-services");
+            setContenView(myServices);
+            myServices.initServiceList(configJson.services);
+        }).catch(error => {
+            console.log(error);
+            window.alert(error);
+        });
+
+
+        var currentContentView = null;
+        function setContenView(contentView) {
+            if (currentContentView != null) {
+                currentContentView.remove();
+            }
+            currentContentView = contentView;
+            document.body.appendChild(currentContentView);
+        }
+
+
+    </script>
 </html>

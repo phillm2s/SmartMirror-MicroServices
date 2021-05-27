@@ -109,28 +109,39 @@
         window.location.href = "./edit-service.html?index=" + index;
     };
 
+    function displayServiceList(configJson){
+        var serviceListDiv = document.getElementById("service-list");
+        configJson.services?.forEach((service, index) => {
+            console.log("loaded config: '" + service.name + "' with data: ");
+            console.log(service);
+            var serviceDiv = addServiceButton(serviceListDiv, index, service);
+            addDeleteFunction(serviceDiv, index, configJson);
+        });
+        addNewButton(serviceListDiv);
+    }
+    
+    
+    
+    //extract mirror webserver url from url param
+    const urlParams = new URLSearchParams(window.location.search);
+    let mirrorUrl = urlParams.get("device");
+    if (mirrorUrl == null) {window.alert("Device parameter needed!")};
+    
+    //save mirror url in session storage
+    sessionStorage.setItem("device",mirrorUrl);
+    loadConfigInSessionStorage((data)=>{displayServiceList(data)});
 
-    window.addEventListener("message",(message)=>{
-        console.log(message.data);
-    });
-    // request config file on loading page via iframe parent delegation
-    parent.postMessage("","*");
-
-    // var serviceList = document.getElementById("service-list");
-    // fetch("./../config.json")
-    //     .then((response) => response.json())
-    //     .then((data) => {
-    //         console.log("Load Service Configurations");
-
-    //         var serviceListDiv = document.getElementById("service-list");
-    //         data.services?.forEach((service, index) => {
-    //             console.log("loaded config: '" + service.name + "' with data: ");
-    //             console.log(service);
-    //             var serviceDiv = addServiceButton(serviceListDiv, index, service);
-    //             addDeleteFunction(serviceDiv, index, data);
-    //         });
-    //         addNewButton(serviceListDiv);
-    //     });
+    // // fetch config file from webserver to display services and check if mirror is available
+    // fetch("http://localhost:8080/get-config", {mode: 'cors'})
+    //     .then(response => response.json())
+    //     .catch((error)=>{
+    //         window.alert("Mirror not available! Code:" + error);
+    //     })
+    //     .then(data => {
+    //         console.log(data);
+    //         displayServiceList(data);
+    //     }
+    // );
     
 
 
