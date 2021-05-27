@@ -115,7 +115,8 @@
 
             var erstimpfung = vaccinations.data.vaccinated - vaccinations.data.secondVaccination.vaccinated;
             var zweitimpfung = vaccinations.data.secondVaccination.vaccinated;
-            var rest = 83000000 - erstimpfung - zweitimpfung;
+            var genesen = overview?.recovered | 0
+            var rest = 83000000 - erstimpfung - zweitimpfung - genesen;
             
             var content = [
                 ['Task', ''],
