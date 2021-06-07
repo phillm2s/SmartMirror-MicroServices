@@ -93,7 +93,7 @@ async function sendServicesUpdateRequest(servicesJsonArray) {
     return new Promise((resolve,reject)=>{
         //load old model
         loadDeviceUrl()
-        .then(url => { loadConfig() })
+        .then(url => { loadConfig(url) })
         .then(config => {
             //override services
             config.services = servicesJsonArray;
@@ -103,10 +103,6 @@ async function sendServicesUpdateRequest(servicesJsonArray) {
                 if (this.readyState == 4) {
                     if (this.status == 200) {
                         resolve();
-                        // unblockView();
-                        // //go back to my services page
-                        // window.alert("Service Deleted")
-                        // location.reload();
                     } else {
                         reject(this.status);
                     }
