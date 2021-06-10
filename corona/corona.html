@@ -60,8 +60,10 @@
 
         </div>
     </body>
+    <script src="./../iframeParentCallback.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script>
+
         var urlParams = new URLSearchParams(window.location.search);
         var incidenceForLastxDays = urlParams.get("days") | 180;
 
@@ -83,6 +85,7 @@
                             vaccinations: bothResponses[0].value,
                             overview: bothResponses[1].value
                         });
+                        sendSucessfullLoadedCallback();
                     });
             }catch(e){
                 console.log(e);
