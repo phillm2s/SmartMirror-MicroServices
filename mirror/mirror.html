@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body{
+            background-color: black;
+            color: white;
+            overflow: hidden;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <title>Mirror</title>
+</head>
+<body>
+</body>
+<script src="./componentManager.js"></script>
+<script>
+    var latestJson = "";
+
+    var https = "https://127.0.0.1:8080";
+    var http = "http://127.0.0.1:8081"; 
+    var mirrorURL =  https; //"https://127.0.0.1:8080";
+
+    fetch(mirrorURL+"/api/services")
+        .then((response) => response.json())
+        .then((data) => {
+            latestJson = JSON.stringify(data);
+            console.log("Load Service Configurations");
+            var versionSpan = document.createElement("span");
+            versionSpan.textContent = data.version;
+            setTimeout(()=>{versionSpan.remove();},1000*60);
+
+            document.body.appendChild(versionSpan);
+            data.services.forEach(service => {
+                console.log("loaded config: '" + service.name + "' with data: "); 
+                console.log(service);
+
+                new View(service.name, service.url, service.position, service.parameter || null);
+            });
+        });
+
+    setInterval(()=>{
+        checkForConfigUpdate();
+    },1000*60*5); //5min
+    var checkForConfigUpdate = function() {
+        fetch(mirrorURL+"/api/services")
+            .then((response) => response.json())
+            .then((data) => {
+                if(latestJson != JSON.stringify(data)){
+                    window.location.reload();
+                }
+            });
+    };
+</script>
+</html>
