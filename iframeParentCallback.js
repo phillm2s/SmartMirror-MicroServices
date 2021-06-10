@@ -1,4 +1,6 @@
-
+/**
+ * Optional Parameter could be: {expirationTimeSec: 30*60}
+ */
 function sendSucessfullLoadedCallback(optionalParameter ={}){
     var dto ={
         height: document.body.offsetHeight,
