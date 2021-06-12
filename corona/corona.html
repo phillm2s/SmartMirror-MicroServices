@@ -78,7 +78,6 @@
                 response = await response.json();
 
                 displayCases(response);
-                setTimeout(()=>{ sendSucessfullLoadedCallback() },2000); //also display linechart if pie chart cant be loaded
                 await Promise.allSettled(
                     [fetch('https://api.corona-zahlen.org/vaccinations').then((responseA) => responseA.json()),
                     fetch('https://api.corona-zahlen.org/germany').then((responseB) => responseB.json())])
