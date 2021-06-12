@@ -86,7 +86,7 @@
                             vaccinations: bothResponses[0].value,
                             overview: bothResponses[1].value
                         });
-                        setTimeout(()=>{ sendSucessfullLoadedCallback() },2000);
+                        setTimeout(()=>{ sendSucessfullLoadedCallback({expirationTimeSec: 300*60}) },2000);
                     });
             }catch(e){
                 console.log(e);
