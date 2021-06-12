@@ -47,7 +47,7 @@ class View {
         setTimeout(()=>{
             instance.frame1.style.border = "0";
             instance.frame2.style.border = "0";
-        }, 1000*20);
+        }, 1000*30);
 
         this.activeFrame = this.frame2; //inertital state
         this.inaktiveFrame = this.frame1;
@@ -94,7 +94,7 @@ class View {
                     };
                 },()=>{
                     connectionFailedCounter ++;
-                    if (connectionFailedCounter <= 3){ var timeoutSec = 20; }
+                    if (connectionFailedCounter <= 3){ var timeoutSec = 30; }
                     else if (connectionFailedCounter <= 4){ var timeoutSec = 120; }
                     else if (connectionFailedCounter <= 6){ var timeoutSec = 20*60; }
                     else if (connectionFailedCounter <= 7){ var timeoutSec = 90*60; }
