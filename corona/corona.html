@@ -78,7 +78,7 @@
                 response = await response.json();
 
                 displayCases(response);
-
+                setTimeout(()=>{ sendSucessfullLoadedCallback() },2000); //also display linechart if pie chart cant be loaded
                 await Promise.allSettled(
                     [fetch('https://api.corona-zahlen.org/vaccinations').then((responseA) => responseA.json()),
                     fetch('https://api.corona-zahlen.org/germany').then((responseB) => responseB.json())])
@@ -87,8 +87,8 @@
                             vaccinations: bothResponses[0].value,
                             overview: bothResponses[1].value
                         });
+                        setTimeout(()=>{ sendSucessfullLoadedCallback() },2000);
                     });
-                    setTimeout(()=>{ sendSucessfullLoadedCallback() },2000);
             }catch(e){
                 console.log(e);
             }
@@ -148,7 +148,7 @@
                 var options = {
                     colors: bgColors,
                     slices: {1: {textStyle: {color: 'black'}}}, //only
-                    chartArea: {left:0, top:0, width:"100%", height:"100%"},
+                    chartArea: {left:0, top:0, width:"80%", height:"80%"},
                     width: 350,
                     height: 220,
                     backgroundColor: 'black',
