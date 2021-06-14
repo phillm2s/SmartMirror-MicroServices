@@ -9,6 +9,8 @@
             color: white;
             font-family: Tahoma, sans-serif;
             overflow: hidden;
+            margin: 0px;
+            padding: 8px;
         }
         h1{
             font-size: large;
@@ -241,7 +243,7 @@
                 // </div>
             }
 
-            sendSucessfullLoadedCallback({expirationTimeSec: 30*60});
+            useDefaultCallbackAndReziseHandler({expirationTimeSec: 30*60});
         }).
         catch((error) => {//todo: exception handling
             console.log(error);

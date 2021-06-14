@@ -18,9 +18,6 @@
                 flex-direction: column;
                 margin-top: 1em;
             }
-            .box {
-                
-            }
             .chart {
                 margin-top: 1em;
                 margin-bottom: 1em;
@@ -60,7 +57,7 @@
             <div id="vaccine-div" class="box">
                 <h2>Impffortschritt</h2>
                 <div id="vaccine-pie" class="chart"></div>
-                <div class="default-font"> <span>Imfungen Heute:</span> <span id="todays-progress" style="margin-left: 1em;">?</span> </div>
+                <div class="default-font" style="margin-bottom: 0.5em;"> <span>Imfungen Heute:</span> <span id="todays-progress" style="margin-left: 1em;"></span> </div>
             </div>
 
         </div>
@@ -86,7 +83,7 @@
                             vaccinations: bothResponses[0].value,
                             overview: bothResponses[1].value
                         });
-                        setTimeout(()=>{ sendSucessfullLoadedCallback({expirationTimeSec: 300*60}) },2000);
+                        useDefaultCallbackAndReziseHandler({expirationTimeSec: 5*60*60});
                     });
             }catch(e){
                 console.log(e);
