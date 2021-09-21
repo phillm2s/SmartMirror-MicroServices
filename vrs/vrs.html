@@ -1,27 +1,193 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script src="./../iframeParentCallback.js"></script>
         <script src="vrs_api.js"></script>
         <style>
-            body {
+            body{
+                width: fit-content;
+                height: fit-content;
                 background-color: black;
                 color: white;
                 font-family: Tahoma, sans-serif;
-                width: fit-content;
-                height: fit-content;
                 overflow: hidden;
+                margin: 0px;
             }
+
+            table .departure-time {
+                text-align: center;
+            }
+
+            table .departure-time-late {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            table .departure-time-late #delayed{
+                color: lightblue;
+            }
+            table .departure-time-late #scheduled{
+                font-size: 0.7em;
+            }
+            table td, table th {
+                padding: 0.2em;
+                padding-left: 0.4em;
+                padding-right: 0.4em;
+            }
+            table tr, td, th {
+                border: 1px solid #ddd;
+            }
+            table .direction {
+                max-width: 13em;
+                width: 13em;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                font-size: 0.9em;
+            }
+            table #count-down, table #line {
+                
+                text-align: center;
+            }
+            table img {
+                width: 1em;
+                margin-left: 0.3em;
+            }
+            #headline #stop-point {
+                color: lightblue;
+            }
+            #last-update-div span {
+                font-size: 0.7em;
+                color: lightgray;
+            }
+
+            .rotating-element {
+                animation: rotating 3s;
+            }
+            @keyframes rotating {
+                100% {transform: rotateX(360deg);}
+            }
+
         </style>
     </head>
     <body>
-        
+        <div id="headline" style="margin-bottom: 0.2em; font-size: 1.1em;">Live-Fahrplan:<span class="station-name"></span><span id="stop-point" style="margin-left: 1em;">...</span></div>
+
+        <div id="time-table-container" class="rotating-element">
+            <table id="time-table">
+                <tr id="description">
+                    <th>Abfahrt</th>
+                    <th>Abfahrt in</th>
+                    <th>Linie</th>
+                    <th>Richtung</th>
+                </tr>
+
+                <tr class="content">
+                    <td colspan="4">Kein Fahrplan gefunden</td>
+                </tr>
+                  
+                <!-- new rows added via js -->
+            </table>
+        </div>
+        <div id="last-update-div"><span>Last update: </span><span id="last-update"></span></div>
+
     </body>
     <script>
+        //get parameter from call
+        const urlParams = new URLSearchParams(window.location.search);
+        let vrsUrl = urlParams.get("vrsurl");
         
-        (async () => {
-            getStationIDFromName("bonn");
-            //console.log( text );
-        })();
+
+        updateTimetable();
+
+
+        function updateTimetable() {
+            getTimetable(vrsUrl).then( jsonResponse => {
+                console.log(jsonResponse);
+
+                if (jsonResponse.events.size == 0)
+                    return Promise.reject("response is emty");
+                
+                document.getElementById("stop-point").textContent = jsonResponse.events[0].stopPoint.name || " ";
+                document.getElementById("last-update").textContent = jsonResponse.updated;
+
+                var timeTable = document.getElementById("time-table");
+                // remove all old columns with class 'content'
+                timeTable.querySelectorAll(".content").forEach(row => {
+                    row.remove();
+                });
+
+                //add rows with new content
+                jsonResponse.events.forEach(element => {
+                    // Skip if train arrives in under 2 minutes
+                    var timeLeft = element.departure.timestamp- Date.now()/1000;
+                    timeLeft = parseInt( (timeLeft/60)+0.5 )
+                    if(timeLeft <= 2 ) {
+                        return;
+                    }
+
+                    var row = document.createElement("tr");
+                    row.className = "content";
+                    timeTable.appendChild(row);
+
+                    // ================ departure=================
+                    var time = document.createElement("td");
+                    time.className ="departure-time";
+                    row.appendChild(time);
+                    // ------ to late ------
+                    if (element.departure.estimate && (element.departure.estimate != element.departure.timetable)) {
+                        var div = document.createElement("div");
+                        time.appendChild(div);
+                        div.className = "departure-time-late";
+
+                        let spanDelayed = document.createElement("span");
+                        div.appendChild(spanDelayed);
+                        spanDelayed.id = "delayed";
+                        spanDelayed.textContent  = element.departure.estimate;
+
+                        var spanScheduled = document.createElement("span");
+                        div.appendChild(spanScheduled);
+                        spanScheduled.id = "scheduled";
+                        spanScheduled.textContent = "("+element.departure.timetable+")";
+                    } else {
+                        // ----- in time ----
+                        time.textContent = element.departure.timetable || " ";
+                        row.appendChild(time);
+                    }
+                    
+
+                    // ============= countdown ================
+                    var countDown = document.createElement("td");
+                    countDown.textContent = timeLeft + " min"
+                    countDown.id = "count-down";
+                    row.appendChild(countDown)
+
+                    // ================ line =================
+                    var line = document.createElement("td");
+                    var span = document.createElement("span");
+                    line.appendChild(span);
+                    span.textContent = element.line.number || " ";
+                    line.id = "line";
+                    if (element.line.product == "LightRail"){
+                        var img = document.createElement("img");
+                        img.src ="./imgages/LightRail.png";
+                        line.appendChild(img);
+                    }
+                    row.appendChild(line);
+
+                    // ================ direction =================
+                    var direction = document.createElement("td");
+                    direction.textContent = element.line.direction || " ";
+                    row.appendChild(direction);
+                });
+            
+                return Promise.resolve("success");
+            })
+            .then(()=>{
+                useDefaultCallbackAndReziseHandler({expirationTimeSec: 1*60});
+            })
+        }
 
     </script>
 </html>
