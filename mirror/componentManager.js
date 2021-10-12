@@ -126,11 +126,10 @@ class View {
                     };
                 },(error)=>{
                     connectionFailedCounter ++;
-                    if (connectionFailedCounter <= 3){ var timeoutSec = 30; }
-                    else if (connectionFailedCounter <= 4){ var timeoutSec = 120; }
-                    else if (connectionFailedCounter <= 6){ var timeoutSec = 20*60; }
-                    else if (connectionFailedCounter <= 7){ var timeoutSec = 90*60; }
-                    else { var timeoutSec = 240*60; }
+                    if (connectionFailedCounter <= 3){ var timeoutSec = Math.floor(30+Math.random() * 20); } //random numer between 0 and 18 +30
+                    else if (connectionFailedCounter <= 5){ var timeoutSec = 120; }
+                    else if (connectionFailedCounter <= 7){ var timeoutSec = 20*60; }
+                    else { var timeoutSec = 60*60; }
                     console.log("\n++++++++++++++++++++\nLoading " + name + " failed.");
                     console.log(error);
                     console.log("Refresh " + name + " in " + timeoutSec + " sec.\n++++++++++++++++++++")
