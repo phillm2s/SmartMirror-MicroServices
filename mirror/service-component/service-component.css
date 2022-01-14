@@ -1,0 +1,14 @@
+:host{
+    /* Size is controlled by host element */
+}
+
+
+body {
+    width: 100%;
+    height: 100%;
+}
+
+iframe {
+    width: 100%;
+    height: 100%;
+}

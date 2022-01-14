@@ -1,0 +1,126 @@
+<html>
+    <head>
+        <style>
+            html {
+                font-family: Tahoma, sans-serif;
+            }
+            span.key{
+                margin-right: 1em;
+                color: rgba(0, 0, 0, 70%)
+            }
+            h1 {
+                background-color: thistle;
+            }
+            #parameter {
+                background-color: wheat;
+                padding: 8px;
+                margin-top:8px;
+            }
+
+            table {
+                font-family: arial, sans-serif;
+                border-collapse: collapse;
+            }
+
+            td, th {
+                border: 1px solid black;
+                text-align: left;
+                padding: 8px;
+            }
+
+            tr:nth-child(even) {
+                background-color: #dddddd;
+            }
+        </style>
+    </head>
+    <body>
+        <h1><span class="key">Mirror main service</span></h1>
+
+        <!-- only change 'FILENAME.html' to the correct name -->
+        <h2><span class="key">URL:</span><span class="hostname"></span>mirror.html</h2> 
+
+        <div id=parameter>
+            <h2 style="margin-top: 2px;">The following section describes the requiered pattern for adding new services.</h2>
+            <p>Each service needs a HTML5 web frontend accesable via a regular get request.</p>
+            <p>The loaded web page can contain any common content like css html and java script.</p>
+            <p>Each Service is loaded inside an seperated iframe and is not able to affect other parts of the mirror.</p>
+
+            <p>In the starting phase the mirror loads all given services from the service configuration file.</p>
+            
+            <p>Each service have to fit the following requiered parameters.</p>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Content</th>
+                    <th>Example</th>
+                </tr>
+                <tr>
+                    <td>name</td>
+                    <td>A name for the service (dont have to be unique.)</td>
+                    <td>Time</td>
+                </tr>
+                <tr>
+                    <td>url</td>
+                    <td>The (oarameterless) url to the displayed frontend (GET).</td>
+                    <td>http://my-domain/time/time.html</td>
+                </tr>
+                <tr>
+                    <td>width</td>
+                    <td>The width of the displayed service (in px or %).</td>
+                    <td>400px or 20%</td>
+                </tr>
+                <tr>
+                    <td>height</td>
+                    <td>The height of the displayed service.</td>
+                    <td>350px or 26%</td>
+                </tr>
+                <tr>
+                    <td>top</td>
+                    <td>The distance from the upper service border to the upper screen boarder (in px or %).</td>
+                    <td>0px or 34%</td>
+                </tr>
+                <tr>
+                    <td>left</td>
+                    <td>The distance from the left service border to the left screen boarder (in px or %).</td>
+                    <td>0% or 300px</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div id=parameter>
+            <p>In addition its possible to define any other parameter for an individual service. This services will be added in the form of url encoded get parameter to the given URL.</p>
+            <p>The parameter and keys don't have to be escaped! They will be converted automaticaly by the system.</p>
+
+            <table>
+            <tr>
+                <th>Name</th>
+                <th>Content</th>
+            </tr>
+            <tr>
+                <td>urlParameter</td>
+                <td>An list of key value pairs as get parameters.</td>
+            </tr>
+            </table>
+        </div>
+
+        <div id=parameter>
+            <p>If a service is loaded succesfully, its requiered to send a callback to the parent mirror element.</p>
+            <p>This callback is post message with the content 'loaded'. You can use the following code to send the callback.</p>
+            <code>parent.postMessage("loaded", "*");</code>
+
+            <p>If the mirror don't reccive this callback in a defined duration the page will be reloaded after an expending period of time.</p>
+            <p>After a service gets loaded succesfully in this session it gets never loaded again.</p>
+
+            <p style="font-weight: bolder;">Each service is responsible to update its own content.</p>
+        </div>
+
+    </body>
+    <script>
+        var url = window.location.href.slice(0, window.location.href.lastIndexOf('/')) +"/";
+        
+        var hns= document.getElementsByClassName("hostname");
+        for (let i=0 ; i< hns.length; i++) {
+            hns[i].innerText=url;
+        };
+    </script>
+</html>

@@ -56,7 +56,7 @@ class View {
                 var timeoutHandler = setTimeout(()=>{
                     window.removeEventListener("message", iframeLoadedSucessfullEvent, false);
                     window.removeEventListener("message", repeatableIframeCallback, false);
-                    reject();
+                    reject("callback timeout");
                 },timeout);
 
                 window.addEventListener("message", iframeLoadedSucessfullEvent, false);

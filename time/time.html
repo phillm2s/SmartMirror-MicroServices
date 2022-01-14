@@ -1,17 +1,23 @@
 <html>
     <head>
         <style>
+            html {
+                background-color: white;
+            }
             body{
                 background-color: black;
                 color: white;
                 overflow: hidden;
-                width: fit-content;
-                height: fit-content;
-                padding: 0px;
-                margin-right: 100px;
-
+                width: 100%;
+                height: 100%;
+                margin: 0;
                 font-family: Tahoma, sans-serif;
             }
+            #max-scale {
+                width: fit-content;
+                height: fit-content;
+            }
+
             #time{
                 /* font-family: Garamond, serif; */
                 font-size: 600%;
@@ -26,16 +32,31 @@
         </style>
     </head>
     <body>
-        <p id="time">00:00:00</p>
-        <p id="date">Montag, März 16</p>
+        <div id="max-scale">
+            <p id="time">00:00:00</p>
+            <p id="date">Montag, März 16</p>
+        </div>
     </body>
-    <script src="./../iframeParentCallback.js"></script>
-    <script>
-        useDefaultCallbackAndReziseHandler();
-        
+    <script type="module">
+        import {sendIframeLoadedCallback, scaleElementToParentSize} from "../sharedContent/helperMethods.mjs";
+
+        console.log("loading time ...");
+
+        //useDefaultCallbackAndReziseHandler();
         var timeNode = document.getElementById("time");
         var dateNode = document.getElementById("date");
         setInterval(update, 1000);
+
+        // resize everytime the body element resizes
+        var body = document.getElementsByTagName("body")[0];
+        body.onresize = ()=> {
+            scaleElementToParentSize(document.getElementById("max-scale"),body)
+        };
+
+        // also scale if there is no docuement resize event
+        scaleElementToParentSize(document.getElementById("max-scale"),body)
+
+        sendIframeLoadedCallback();
 
         function update(){
             var date = new Date();
@@ -48,6 +69,5 @@
             dateNode.textContent = date.toLocaleDateString("de-DE",
             {weekday: 'long', month: 'long', day: 'numeric' });
         };
-
     </script>
 </html>

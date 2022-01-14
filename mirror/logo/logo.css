@@ -1,0 +1,71 @@
+:host{
+    position: absolute;
+    background-color: black;
+    width: 100%;
+    height: 100%;
+
+    /* always display in the foreground */
+    z-index: 99; 
+}
+
+div.center-horizontal{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+div.center-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+div#content-container {
+    width: 40vh;
+    height: 40vh;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+}
+
+div#text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* background-color: cyan; */
+    color: black;
+    height: fit-content;
+    margin: 5%;
+    width: 100%;
+
+}
+
+
+#outer-circle {
+    border-radius: 50%;
+    width: fit-content;
+    height: fit-content;
+    padding: 1em;
+    background-color: white;
+
+    /* for animation */
+    animation-name: color;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes color {
+    0% {
+        background-color: rgb(231, 184, 184);
+    }
+    50% {
+        background-color: rgba(231, 184, 184, 0.534);
+    }
+    100% {
+        background-color: rgb(231, 184, 184);
+    }
+}
