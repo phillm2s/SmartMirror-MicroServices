@@ -1,7 +1,7 @@
 import {ServiceComponent} from "./service-component/service-component.mjs"
 
 // ++++++++++++++++++++++++++++++++++++++++++
-var version = "v1.0.2";
+var version = "v1.0.2d";
 var url = "http://127.0.0.1:8081";
 // ++++++++++++++++++++++++++++++++++++++++++
 
