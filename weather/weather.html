@@ -12,9 +12,12 @@
             margin: 0px;
             padding: 8px;
         }
-        h1{
-            font-size: large;
+
+        #content{
+            /* While loading ecerything is invisible. Become visible on success */
+            visibility: hidden;
         }
+
         p1 {
             font-size: 0.7em;
         }
@@ -48,206 +51,77 @@
     </style>
 </head>
 <body>
-    <h1 id="headline">Wetter</h1> 
-    <p1 id="current_time" style="display: block; border-bottom: 10px">xxTag, ??.??.????</p1>
-    
-    <div style="display: flex; width: fit-content; height: fit-content;">
-        <div style="flex: 0; padding-top: 20px; margin-left: 5px; margin-right: 30px; min-width: 200px;">
-            <!-- https://www.online-image-editor.com/ -->
-            <img id="weather_img" width="200">
-            <!-- <rain-cloud></rain-cloud> -->
-        </div>
-        <div id="right" style="flex: 1; margin-left: 10px;">
-            <div id="temperature" style="width: fit-content; line-height: 3em; margin-top:10px">
-                <p2 id="min_temperature">??</p2>
-                <div style="display: inline-block; height: fit-content; width: fit-content; margin-left: 8px; margin-right: 8px;">
-                    <p3 id="current_temperature" style="vertical-align:top;">??</p3>
-                    <span style="vertical-align:top; font-size: 1em; line-height: 100%;">&#8451;</span>
-                </div>
-                <p2 id="max_temperature">??</p2>
-            </div>
-            <div style="display: flex; height: fit-content; margin-top: 10px;">
-                <img class ="icon" src="images/icon_info.jpg" style="float: left;">
-                <p id="description" style="flex: 1; margin: auto; margin-left: 5px; white-space: nowrap;">??...................??</p>
-            </div>
-            
-            <div id="rain" style="margin-top: 20px; width: 200px; height: fit-content;">
-                <div style="width: 100%; font-size: 1em;"><span span style="float: center;">Regenwahrschinlichkeit</span></div>
-                
-                <div style="display: flex; width: 100%; font-size: 0.7em; text-align: center;">
-                    <div style="width: 100%"><span id="precipitation_time1"></span></div>
-                    <div style="width: 100%"><span id="precipitation_time2"></span></div>
-                    <div style="width: 100%"><span id="precipitation_time3"></span></div>
-                    <div style="width: 100%"><span id="precipitation_time4"></span></div>
-                    <div style="width: 100%"><span id="precipitation_time5"></span></div>
-                </div>
-                
-                <div style="width: 100%; height: 2px; background-color: lightblue; margin-bottom: 2px;"></div>
-                <div id="bars" style="display: flex; width: 100%; height: 130px; text-align: center; font-size: 0.8em;">
-                    <div>
-                        <div id="precipitation_bar1" class="bar" style="height: 0px;"></div>
-                        <div id="precipitation1">??%</div>
-                    </div>
-
-                    <div>
-                        <div id="precipitation_bar2" class="bar" style="height: 100px;"></div>
-                        <div id="precipitation2">??%</div>
-                    </div>
-
-                    <div>
-                        <div id="precipitation_bar3" class="bar" style="height: 0px;"></div>
-                        <div id="precipitation3">??%</div>
-                    </div>
-
-                    <div>
-                        <div id="precipitation_bar4" class="bar" style="height: 100px;"></div>
-                        <div id="precipitation4">??%</div>
-                    </div>
-
-                    <div>
-                        <div id="precipitation_bar5" class="bar" style="height: 0px;"></div>
-                        <div id="precipitation5">??%</div>
-                    </div>
-                </div>
-            </div>
-            
-        </div>
-
-    </div>
-
-    <div id="day_forecast" style="display: flex;">
-    </div>
-
-</body>
-<script src="open_weather_api.js"></script>
-<script src="./../iframeParentCallback.js"></script>
-<script>
-    function loadImage(imgElement, name) { //without file extention
-        //try hierarch first gif then png
-        imgElement.src= name + ".gif";
-        var last=false;
-        imgElement.onerror = (()=>{
-            if (last == false) {
-                last=true;
-                imgElement.src= name + ".png";
-            } else {
-                imgElement.parentNode.removeChild(imgElement);
-            }
-        });
-
-    }
-
-    function updateValue(id, value){
-        try {
-            document.getElementById(id).textContent = value;
-        }catch(e){
-            console.log(e);
-        }
-    }
-
-    //get parameter from call
-    const urlParams = new URLSearchParams(window.location.search);
-    let apiKey = urlParams.get("key");
-    let latitude = urlParams.get("lat");
-    let longitude = urlParams.get("lon");
-    let city = urlParams.get("city");
-    if (apiKey==null) {window.location.replace("./../invalidApiKey.html");}
-    
-    if ((latitude && longitude) != null){
-        updateWeather(latitude, longitude, apiKey);
-    } else if(city != null){
-        getCoordinatesFromCityName(city,apiKey)
-        .then(response => response.json())
-        .then(data => {
-            latitude = data[0].lat;
-            longitude = data[0].lon;
-            updateWeather(latitude, longitude, apiKey);
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-    }
-    //neither coordinates or city
-    else {window.location.replace("./../wrongParameters.html");}
+    <div id=content>
+        <h1 id="headline" style="font-size: large;">Wetter</h1> 
+        <p1 id="current_time" style="display: block; border-bottom: 10px">xxTag, ??.??.????</p1>
         
+        <div style="display: flex; width: fit-content; height: fit-content;">
+            <div style="flex: 0; padding-top: 20px; margin-left: 5px; margin-right: 30px; min-width: 200px;">
+                <!-- https://www.online-image-editor.com/ -->
+                <img id="weather_img" width="200">
+                <!-- <rain-cloud></rain-cloud> -->
+            </div>
+            <div id="right" style="flex: 1; margin-left: 10px;">
+                <div id="temperature" style="width: fit-content; line-height: 3em; margin-top:10px">
+                    <p2 id="min_temperature">??</p2>
+                    <div style="display: inline-block; height: fit-content; width: fit-content; margin-left: 8px; margin-right: 8px;">
+                        <p3 id="current_temperature" style="vertical-align:top;">??</p3>
+                        <span style="vertical-align:top; font-size: 1em; line-height: 100%;">&#8451;</span>
+                    </div>
+                    <p2 id="max_temperature">??</p2>
+                </div>
+                <div style="display: flex; height: fit-content; margin-top: 10px;">
+                    <img class ="icon" src="images/icon_info.jpg" style="float: left;">
+                    <p id="description" style="flex: 1; margin: auto; margin-left: 5px; white-space: nowrap;">??...................??</p>
+                </div>
+                
+                <div id="rain" style="margin-top: 20px; width: 200px; height: fit-content;">
+                    <div style="width: 100%; font-size: 1em;"><span span style="float: center;">Regenwahrschinlichkeit</span></div>
+                    
+                    <div style="display: flex; width: 100%; font-size: 0.7em; text-align: center;">
+                        <div style="width: 100%"><span id="precipitation_time1"></span></div>
+                        <div style="width: 100%"><span id="precipitation_time2"></span></div>
+                        <div style="width: 100%"><span id="precipitation_time3"></span></div>
+                        <div style="width: 100%"><span id="precipitation_time4"></span></div>
+                        <div style="width: 100%"><span id="precipitation_time5"></span></div>
+                    </div>
+                    
+                    <div style="width: 100%; height: 2px; background-color: lightblue; margin-bottom: 2px;"></div>
+                    <div id="bars" style="display: flex; width: 100%; height: 130px; text-align: center; font-size: 0.8em;">
+                        <div>
+                            <div id="precipitation_bar1" class="bar" style="height: 0px;"></div>
+                            <div id="precipitation1">??%</div>
+                        </div>
 
-    function updateWeather(latitude, longitude, apiKey){
-        allInOneForecast(latitude, longitude, apiKey)
-        .then(response => response.json())
-        .then(data => {
-            if (data.cod !=null && data.cod == 401) { window.location.replace("./../invalidApiKey.html");}
+                        <div>
+                            <div id="precipitation_bar2" class="bar" style="height: 100px;"></div>
+                            <div id="precipitation2">??%</div>
+                        </div>
 
-            updateValue("headline", (city || "Wetter") );
+                        <div>
+                            <div id="precipitation_bar3" class="bar" style="height: 0px;"></div>
+                            <div id="precipitation3">??%</div>
+                        </div>
 
-            let tos = 0;//data.timezone_offset; //no offset needed? //api gets time in seconds instead millis
-            currentTimeInMillis = (data["current"].dt + tos)*1000 
-            updateValue("current_time", new Date(currentTimeInMillis).toLocaleDateString("de-DE",
-            {hour:"numeric", minute:"numeric", weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })+" Uhr");
-                                                
+                        <div>
+                            <div id="precipitation_bar4" class="bar" style="height: 100px;"></div>
+                            <div id="precipitation4">??%</div>
+                        </div>
 
-            updateValue("current_temperature", Math.round(data["current"].temp));
-            updateValue("description", data["current"].weather[0].description);
+                        <div>
+                            <div id="precipitation_bar5" class="bar" style="height: 0px;"></div>
+                            <div id="precipitation5">??%</div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
 
-            updateValue("min_temperature", Math.round(data["daily"][0].temp.min));
-            updateValue("max_temperature", Math.round(data["daily"][0].temp.max));
+        </div>
 
-            //Main image
-            loadImage(document.getElementById("weather_img"), "images/"+data.current.weather[0].icon);
-
-            //5x 2hours rain forecast
-            for (let i=1;i<6 ;i++) {
-                let t = new Date( (data.hourly[2*(i-1)].dt + tos)*1000 );
-                updateValue("precipitation_time"+i, ("0"+t.getHours()).slice(-2)+":"+("0"+t.getMinutes()).slice(-2));
-                try{
-                    document.getElementById("precipitation_bar"+i).style.height= Math.round(data.hourly[2*(i-1)].pop*100) +"px";
-                }catch(e){console.log(e)}
-                updateValue("precipitation"+i, Math.round(data.hourly[2*(i-1)].pop*100) +"%");
-            }
-
-            //5 Days Daily forecast
-            var mainDiv = document.getElementById("day_forecast");
-            for (let i=1;i<6;i++) { // index 0 is today
-                let dayDiv = document.createElement("div");
-                dayDiv.className = "forecast";
-                dayDiv
-                mainDiv.appendChild(dayDiv);
-
-                let nameDiv = document.createElement("div");
-                nameDiv.style.textAlign="center";
-                nameDiv.style.marginBottom ="3px";
-                nameDiv.textContent = new Date( (data.daily[i].dt + tos)*1000 ).toLocaleDateString("de-DE",{weekday: 'long'}).slice(0,2); //xx
-                dayDiv.appendChild(nameDiv);
-
-                let img = document.createElement("img");
-                //https://www.pinterest.de/pin/414823815662066595/
-                img.src = "images/icons/"+ data.daily[i].weather[0].icon+".png" //xx
-                img.style.width = "50px";
-                dayDiv.appendChild(img);
-
-                let temperatureDiv = document.createElement("div");
-                temperatureDiv.style.width = "100%";
-                temperatureDiv.style.fontSize = "0.8em";
-                let spanMin = document.createElement("span");
-                spanMin.textContent =  Math.round(data.daily[i].temp.min)+""; //xx
-                temperatureDiv.appendChild(spanMin);
-                let spanMax = document.createElement("span");
-                spanMax.style.float = "right";
-                spanMax.textContent = Math.round(data.daily[i].temp.max)+""; //xx
-                temperatureDiv.appendChild(spanMax);
-                dayDiv.appendChild(temperatureDiv);
-
-                //<div id="dayn+1" class="forecast">
-                //     <div style="text-align: center; margin-bottom: 3px;">Mo</div>
-                //     <img src="images/sonne.jpg" width="50px">
-                //     <div style="width: 100%;"><span id="min">?</span> <span id="df_max_n+1" style="float: right;">?</span></div>
-                // </div>
-            }
-
-            useDefaultCallbackAndReziseHandler({expirationTimeSec: 30*60});
-        }).
-        catch((error) => {//todo: exception handling
-            console.log(error);
-        });
-    }
-</script>
+        <div id="day_forecast" style="display: flex;">
+        </div>
+    </div>
+</body>
+<script type="module" src="weather.js"></script>
 </html>
