@@ -8,6 +8,9 @@ const updateEveryXSeconds = 60*20; // 20 minutes
 
 var urlParameters;
 
+// scale service on resizing parent item
+document.body.onresize = ()=>{ helperMethods.scaleElementToParentSize(document.getElementById("content"), document.body);};
+
 (async() => {
     // check url parameter
     try {
@@ -50,22 +53,40 @@ var urlParameters;
         throw err;
     }
 
-    displayWeather(forecastData);
+    // wait with rescaling until the dom events have changed
+    displayWeather(forecastData).then(()=>{ helperMethods.scaleElementToParentSize(document.getElementById("content"), document.body); });
 
     // Set visibility of main content window
     document.getElementById("content").style.visibility = "visible";
+    
 
-    while(true){
-        // wait x seconds
-        await new Promise(resolve => setTimeout(resolve,5*1000));
-        console.log("A")
-        await helperMethods.circuitBreaker(()=>{
-            console.log("try...");
-            throw new Error("TEST ERRRO");
+    let refresh = () => {
+        helperMethods.circuitBreaker(async ()=>{
+
+            //Load actual weather data
+            let forecastData =  await weatherAPI.allInOneForecast(latitude, longitude, urlParameters.apiKey);
+            
+            // update Dom with the loaded data
+            displayWeather(forecastData).then(()=>{ helperMethods.scaleElementToParentSize(document.getElementById("content"), document.body); });
+
         },[5*1000, 10*1000, 30*1000, 2*60*1000, 5*60*1000, 5*60*1000, 10*60*1000], true,
-        (retry, err)=>{console.log(retry+ ", "+ err.message)});
+        (retry, err)=>{
+            // On each error
+            console.log("Weater Service Circuit Breaker: "+ retry+ ", "+ err.message);
+        }).then(()=>{
+            // On success
+            console.log("Weater Service sucessfully updated");
 
+            // try again after timeout
+            console.log("Refresh Weather content in " + updateEveryXSeconds + " seconds.");
+            window.setTimeout(()=>{
+                refresh();
+            },updateEveryXSeconds*1000);
+        })
     }
+
+    
+
     
 })();
 
@@ -78,10 +99,11 @@ var urlParameters;
 // ==================== METHODS ==========================
 
 /**
- * 
+ * This Method updates all relevant DOM elements with the given content
  * @param {IForecastData} forecastData
  */
-function displayWeather(forecastData){
+async function displayWeather(forecastData){
+    let subPromises = []
 
     var tryToSetElementText = (elementName, text) => {
         try{
@@ -97,7 +119,98 @@ function displayWeather(forecastData){
         {hour:"numeric", minute:"numeric", weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
         +" Uhr");
     
+    tryToSetElementText("current_temperature", Math.round(forecastData.current.temp));
 
+    tryToSetElementText("description", forecastData.current.weather[0].description); 
+
+    tryToSetElementText("min_temperature", Math.round(forecastData.daily[0].temp.min));
+
+    tryToSetElementText("max_temperature", Math.round(forecastData.daily[0].temp.max));
+
+    tryToSetElementText("feels_like", "Gefühlt: " + Math.round(forecastData.current.feels_like));
+
+    let loadWeatherImageProm =( async ()=> { // load weather specific image.
+        //TODO: cool gifs on that page: https://giphy.com/gifs/flaticons-U23jW3n2KIcdNaA3IB
+        try{
+            let imagesFolderPath = "images";
+            let imageName = forecastData.current.weather[0].icon;
+            // if there is a gif for this weather, load it.
+            let imgElement = document.getElementById("weather_img");
+            
+            let alreadyTried = false;
+
+            
+            imgElement.onerror= ()=>{ // define fallback image
+                if(!alreadyTried){ alreadyTried=true; imgElement.src = imagesFolderPath +"/"+ imageName +".png"; }
+                else { imgElement.parentNode.removeChild(imgElement); } 
+            }
+
+            // try to laod gif
+            imgElement.src = imagesFolderPath +"/"+ imageName +".gif";
+        } catch(err) {console.warn(err);}
+        
+    })();
+    subPromises.push(loadWeatherImageProm);
+    
+    for (let i=1;i<6 ;i++) { //5x 2hours rain forecast
+        let hourTime = new Date( (forecastData.hourly[2*(i-1)].dt)*1000 );
+        tryToSetElementText("precipitation_time"+i, ("0"+hourTime.getHours()).slice(-2)+":"+("0"+hourTime.getMinutes()).slice(-2));
+        try{
+            document.getElementById("precipitation_bar"+i).style.height= Math.round(forecastData.hourly[2*(i-1)].pop*100) +"px";
+        }catch(e){console.warn(e)}
+        tryToSetElementText("precipitation"+i, Math.round(forecastData.hourly[2*(i-1)].pop*100) +"%");
+    }
+
+    
+    let loadDailyForecastImagesProm = ( async ()=> { //5 Days Daily forecast. As smal previews
+        let nextDaysDiv = document.getElementById("day_forecast");
+        for (let i=1;i<6;i++) { // index 0 is today
+
+            let dayDiv = document.createElement("div");
+            dayDiv.className = "forecast";
+            nextDaysDiv.appendChild(dayDiv);
+
+            let nameDiv = document.createElement("div");
+            nameDiv.style.textAlign="center";
+            nameDiv.style.marginBottom ="3px";
+            // Cut the both first letters: eg Mo, Di
+            nameDiv.textContent = new Date( (forecastData.daily[i].dt)*1000 ).toLocaleDateString("de-DE",{weekday: 'long'}).slice(0,2);
+            dayDiv.appendChild(nameDiv);
+
+            // load icon
+            let img = document.createElement("img");
+            // icon source: https://www.pinterest.de/pin/414823815662066595/
+            img.src = "images/icons/"+ forecastData.daily[i].weather[0].icon+".png" //xx
+            img.style.width = "50px";
+            dayDiv.appendChild(img);
+
+            // min and max temprature
+            let temperatureDiv = document.createElement("div");
+            temperatureDiv.style.width = "100%";
+            temperatureDiv.style.fontSize = "0.8em";
+            let spanMin = document.createElement("span");
+            spanMin.textContent =  Math.round(forecastData.daily[i].temp.min)+""; //xx
+            temperatureDiv.appendChild(spanMin);
+            let spanMax = document.createElement("span");
+            spanMax.style.float = "right";
+            spanMax.textContent = Math.round(forecastData.daily[i].temp.max)+""; //xx
+            temperatureDiv.appendChild(spanMax);
+            dayDiv.appendChild(temperatureDiv);
+
+            // === HTML template for the next x day predictions
+            /** 
+            <div id="dayn+1" class="forecast">
+                <div style="text-align: center; margin-bottom: 3px;">Mo</div>
+                <img src="images/sonne.jpg" width="50px">
+                <div style="width: 100%;"><span id="min">?</span> <span id="df_max_n+1" style="float: right;">?</span></div>
+            </div>
+            */
+            // ==================================================
+        }
+    })();
+    subPromises.push(loadDailyForecastImagesProm);
+    
+    return await Promise.all(subPromises);
 }
 
 
@@ -179,109 +292,4 @@ function showErrorMessage(message){
     setTimeout(()=>{
         document.body.innerHTML="";
     },60*1000);
-}
-
-
-// function loadImage(imgElement, name) { //without file extention
-//     //try hierarch first gif then png
-//     imgElement.src= name + ".gif";
-//     var last=false;
-//     imgElement.onerror = (()=>{
-//         if (last == false) {
-//             last=true;
-//             imgElement.src= name + ".png";
-//         } else {
-//             imgElement.parentNode.removeChild(imgElement);
-//         }
-//     });
-
-// }
-
-
-// function updateValue(id, value){
-//     try {
-//         document.getElementById(id).textContent = value;
-//     }catch(e){
-//         console.log(e);
-//     }
-// }
-   
-
-function updateWeather(latitude, longitude, apiKey){
-    allInOneForecast(latitude, longitude, apiKey)
-    .then(response => response.json())
-    .then(data => {
-        if (data.cod !=null && data.cod == 401) { window.location.replace("./../invalidApiKey.html");}
-
-        updateValue("headline", (city || "Wetter") );
-
-        let tos = 0;//data.timezone_offset; //no offset needed? //api gets time in seconds instead millis
-        currentTimeInMillis = (data["current"].dt + tos)*1000 
-        updateValue("current_time", new Date(currentTimeInMillis).toLocaleDateString("de-DE",
-        {hour:"numeric", minute:"numeric", weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })+" Uhr");
-                                            
-
-        updateValue("current_temperature", Math.round(data["current"].temp));
-        updateValue("description", data["current"].weather[0].description);
-
-        updateValue("min_temperature", Math.round(data["daily"][0].temp.min));
-        updateValue("max_temperature", Math.round(data["daily"][0].temp.max));
-
-        //Main image
-        loadImage(document.getElementById("weather_img"), "images/"+data.current.weather[0].icon);
-
-        //5x 2hours rain forecast
-        for (let i=1;i<6 ;i++) {
-            let t = new Date( (data.hourly[2*(i-1)].dt + tos)*1000 );
-            updateValue("precipitation_time"+i, ("0"+t.getHours()).slice(-2)+":"+("0"+t.getMinutes()).slice(-2));
-            try{
-                document.getElementById("precipitation_bar"+i).style.height= Math.round(data.hourly[2*(i-1)].pop*100) +"px";
-            }catch(e){console.log(e)}
-            updateValue("precipitation"+i, Math.round(data.hourly[2*(i-1)].pop*100) +"%");
-        }
-
-        //5 Days Daily forecast
-        var mainDiv = document.getElementById("day_forecast");
-        for (let i=1;i<6;i++) { // index 0 is today
-            let dayDiv = document.createElement("div");
-            dayDiv.className = "forecast";
-            dayDiv
-            mainDiv.appendChild(dayDiv);
-
-            let nameDiv = document.createElement("div");
-            nameDiv.style.textAlign="center";
-            nameDiv.style.marginBottom ="3px";
-            nameDiv.textContent = new Date( (data.daily[i].dt + tos)*1000 ).toLocaleDateString("de-DE",{weekday: 'long'}).slice(0,2); //xx
-            dayDiv.appendChild(nameDiv);
-
-            let img = document.createElement("img");
-            //https://www.pinterest.de/pin/414823815662066595/
-            img.src = "images/icons/"+ data.daily[i].weather[0].icon+".png" //xx
-            img.style.width = "50px";
-            dayDiv.appendChild(img);
-
-            let temperatureDiv = document.createElement("div");
-            temperatureDiv.style.width = "100%";
-            temperatureDiv.style.fontSize = "0.8em";
-            let spanMin = document.createElement("span");
-            spanMin.textContent =  Math.round(data.daily[i].temp.min)+""; //xx
-            temperatureDiv.appendChild(spanMin);
-            let spanMax = document.createElement("span");
-            spanMax.style.float = "right";
-            spanMax.textContent = Math.round(data.daily[i].temp.max)+""; //xx
-            temperatureDiv.appendChild(spanMax);
-            dayDiv.appendChild(temperatureDiv);
-
-            //<div id="dayn+1" class="forecast">
-            //     <div style="text-align: center; margin-bottom: 3px;">Mo</div>
-            //     <img src="images/sonne.jpg" width="50px">
-            //     <div style="width: 100%;"><span id="min">?</span> <span id="df_max_n+1" style="float: right;">?</span></div>
-            // </div>
-        }
-
-        useDefaultCallbackAndReziseHandler({expirationTimeSec: 30*60});
-    }).
-    catch((error) => {//todo: exception handling
-        console.log(error);
-    });
 }

@@ -23,6 +23,8 @@ export function scaleElementToParentSize(element, parent) {
         scaleRatio = scaleHeight
     }
 
+    //console.log("SCALE TO: " + scaleRatio);
+
     element.style.transform = "scale(" + scaleRatio + "%," + scaleRatio + "%)";
     element.style.transformOrigin = "left top";
 }

@@ -6,7 +6,7 @@
  * @param {*} apiKey 
  * @returns {Promise<IForecastData>}
  */
-export function allInOneForecast(latitude, longitude, apiKey) {
+export async function allInOneForecast(latitude, longitude, apiKey) {
     var url = "https://api.openweathermap.org/data/2.5/onecall"+
         "?lat=" + latitude +
         "&lon=" + longitude +
@@ -15,25 +15,19 @@ export function allInOneForecast(latitude, longitude, apiKey) {
         "&units=metric" +
         "&appid=" + apiKey;
 
-    return new Promise((resolve, reject)=> {
-        (async ()=>{
-            try{
-                let data = await fetch(url, {mode: 'cors'}).then(res => {
-                    if (!res.ok){
-                        if (res.status == 401){ throw new UnauthorizedError("Invalid API key."); }
-                        throw new HttpResponseError(res.statusText);
-                    }
-                    return res.json();
-                });
-                let iForeCastData = new IForecastData();
-                iForeCastData = Object.assign(iForeCastData, data);
-                resolve(iForeCastData);
-            } catch(err){
-                reject(err);
-            }
-        })();
+    
+    let data = await fetch(url, {mode: 'cors'}).then(res => {
+        if (!res.ok){
+            if (res.status == 401){ throw new UnauthorizedError("Invalid API key."); }
+            throw new HttpResponseError(res.statusText);
+        }
+        return res.json();
     });
     
+    let iForeCastData = new IForecastData();
+    iForeCastData = Object.assign(iForeCastData, data);
+    return iForeCastData;
+
 }
 
 /**
@@ -92,8 +86,42 @@ export class IForecastData{
         /** current date Time in seconds*/
         dt: null,
         
-        clouds: null
+        /** temperature */
+        temp: null,
+
+        /** feeled temperature */
+        feels_like: null,
+
+        /** Array of size 1 */
+        weather: [{
+            description: null,
+            icon: null
+        }]
     }
+
+    /** Array with an element for each day */
+    daily = [{
+        temp: {
+            min: null,
+            max: null
+        },
+
+        /** Array of size 1 */
+        weather: [{
+            icon: null
+        }],
+
+        /**Date time of that day */
+        dt: null
+    }]
+
+    hourly = [{
+        /**Date time of this hour */
+        dt: null,
+
+        /**precipitation propability as decimal value, e.g 0.3 */
+        pop: null
+    }]
 
 
 

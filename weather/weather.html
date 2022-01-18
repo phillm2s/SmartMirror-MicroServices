@@ -3,19 +3,25 @@
 <head>
     <style>
         body{
-            width: fit-content;
-            height: fit-content;
             background-color: black;
             color: white;
             font-family: Tahoma, sans-serif;
+
             overflow: hidden;
             margin: 0px;
-            padding: 8px;
+
+            width: 100vw;
+            height: 100vh;
         }
 
         #content{
             /* While loading ecerything is invisible. Become visible on success */
             visibility: hidden;
+
+            width: fit-content;
+            height: fit-content;
+
+            padding: 8px;
         }
 
         p1 {
@@ -57,9 +63,11 @@
         
         <div style="display: flex; width: fit-content; height: fit-content;">
             <div style="flex: 0; padding-top: 20px; margin-left: 5px; margin-right: 30px; min-width: 200px;">
-                <!-- https://www.online-image-editor.com/ -->
                 <img id="weather_img" width="200">
-                <!-- <rain-cloud></rain-cloud> -->
+                <div style="display: flex; height: fit-content; padding-top: 5px; padding-bottom: 10px; align-content: center;">
+                    <img class ="icon" src="images/icon_info.jpg" style="float: left;">
+                    <p id="description" style="margin: 4px; overflow: hidden; font-size: 0.9em;" >??...................??</p>
+                </div>
             </div>
             <div id="right" style="flex: 1; margin-left: 10px;">
                 <div id="temperature" style="width: fit-content; line-height: 3em; margin-top:10px">
@@ -70,9 +78,12 @@
                     </div>
                     <p2 id="max_temperature">??</p2>
                 </div>
-                <div style="display: flex; height: fit-content; margin-top: 10px;">
+
+                <div style="display: flex; height: fit-content; padding-top: 10px;">
                     <img class ="icon" src="images/icon_info.jpg" style="float: left;">
-                    <p id="description" style="flex: 1; margin: auto; margin-left: 5px; white-space: nowrap;">??...................??</p>
+                    <p style="display: flex; margin: auto; margin-left: 5px;">
+                        <span id="feels_like">Gefühlt</span> <span style="font-size: 0.8em; margin-left: 0.2em;">℃</span>
+                    </p>
                 </div>
                 
                 <div id="rain" style="margin-top: 20px; width: 200px; height: fit-content;">
