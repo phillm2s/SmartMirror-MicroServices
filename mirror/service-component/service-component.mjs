@@ -88,9 +88,10 @@ export class ServiceComponent extends HTMLElement {
 
     /**
      * Try loading the service content
+     * @param {any} parameter An object with any paramter used as paameter for the service request. can be null.
      * @return {Promise} Resolve if receiving a 'loaded' callback from the service. Reject if timeout is reached without a callback
      */
-    loadContent(timeout = 25*1000) {
+    loadContent(parameter=null ,timeout = 25*1000) {
         return new Promise((resolve,reject) => {
             if (this.componentInitialized == false) { reject(new Error("Component is not initialized. Attach it first.")); return; }
             
@@ -123,8 +124,17 @@ export class ServiceComponent extends HTMLElement {
     
             console.log("Start loading '" + this.getAttribute("name") + "' service.")
             
+            let urlWithParameter = instance.serviceUrl;
+            if (parameter!= null && parameter != {}){
+                let first= true;
+                for(let key of Object.keys(parameter)){
+                    first ? urlWithParameter += "?" + key + "=" + parameter[key] : urlWithParameter += "&" + key + "=" + parameter[key]
+                    first = false;
+                }
+            }
+
             // with setting the src attribute the iframe load the content
-            instance.iframe.src = instance.serviceUrl;
+            instance.iframe.src = urlWithParameter;
         });
     }
 }

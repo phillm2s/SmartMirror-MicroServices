@@ -64,7 +64,7 @@ function showLogoUntilServicesAreLoaded(version="", maxWaitDuration=30*1000, min
 
 /**
  * Fetch the mirror Configuration from local webserver
- * @returns {Promise<any>}
+ * @returns {Promise<ServiceConfiguration[]>}
  */
 function loadMirrorServiceConfigurations() {
 
@@ -96,7 +96,8 @@ function displayServices(serviceConfigurations) {
         var body = document.getElementsByTagName("body")[0];
 
         // Create all HTML service components
-        var services = []; // HTMLElement 
+        var services = []; // HTMLElement
+        let loadingServicesPromises = [];
         for (let serviceConfiguration of serviceConfigurations) {
             try {
                 let serviceComponent = document.createElement("service-component");
@@ -114,26 +115,19 @@ function displayServices(serviceConfigurations) {
                     "top", serviceConfiguration.top || (()=>{ throw new Error("Missing 'top' in service '"+serviceConfiguration.name+"' configuration'") })());
                 serviceComponent.setAttribute(
                     "left", serviceConfiguration.left || (()=>{ throw new Error("Missing 'left' in service '"+serviceConfiguration.name+"' configuration'") })());
+                            
                 
-                // add new service to the list of services
-                services.push(serviceComponent);
+                body.appendChild(serviceComponent);
+        
+                let prom = loadServiceUsingCircuitBreaker(serviceComponent, serviceConfiguration.urlParameter);
+                prom.then(() => { console.log("Service: " + serviceComponent.serviceName +" loaded.") })
+    
+                loadingServicesPromises.push(prom);
+                
             } catch(err) { console.error(err); console.info(serviceConfiguration.name + " service will be ignored."); }
         }
 
-        let loadingServicesPromises = [];
-        for (let service of services){
-
-            body.appendChild(service);
-            
-            let prom = loadServiceUsingCircuitBreaker(service);
-            prom.then(loadedService => { console.log("Service: " + service.serviceName +" loaded.") })
-
-            loadingServicesPromises.push(prom);
-        }
-
-        // resolve if ALL promises are resolves.
         return Promise.allSettled(loadingServicesPromises);
-
     })();
 }
 
@@ -141,17 +135,18 @@ function displayServices(serviceConfigurations) {
  * Try repeadly loading the given service.
  * Resolve the Promise containing the given Service if loaded successfully.
  * Never reject the Promise.
- * @param {ServiceComponent} service 
- * @returns {Promise<ServiceComponent>} 
+ * @param {ServiceComponent} serviceComponent
+ * @param {any} serviceParameter An object with key value pairs. Tis pairs will be used as parameter for the service request
+ * @returns {Promise<any>} 
  */
-function loadServiceUsingCircuitBreaker(service) {
+function loadServiceUsingCircuitBreaker(serviceComponent, serviceParameter=null) {
     
     return new Promise((resolve, reject) => {
         (function nextTry(failCounter) {
         
-            service.loadContent()
+            serviceComponent.loadContent(serviceParameter)
             .then(() => { // component loaded successfully
-                resolve(service);
+                resolve(serviceComponent);
             })
             .catch((err) => { // failure while loading component. Retry after timeout
                 console.warn(err);
@@ -173,4 +168,18 @@ function loadServiceUsingCircuitBreaker(service) {
     
         })();
     });
+}
+
+
+// ======== interfaces ============
+
+/** Used as interface for a json service dto */
+export class ServiceConfiguration {
+    name = null;
+    url = null;
+    width = null;
+    height = null;
+    top = null;
+    left = null;
+    urlParameter = {};
 }
