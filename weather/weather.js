@@ -61,32 +61,35 @@ document.body.onresize = ()=>{ helperMethods.scaleElementToParentSize(document.g
     
 
     let refresh = () => {
-        helperMethods.circuitBreaker(async ()=>{
+        console.log("Refresh Weather content in " + Math.floor(updateEveryXSeconds/60) + " minutes.");
 
-            //Load actual weather data
-            let forecastData =  await weatherAPI.allInOneForecast(latitude, longitude, urlParameters.apiKey);
+        window.setTimeout(()=>{
             
-            // update Dom with the loaded data
-            displayWeather(forecastData).then(()=>{ helperMethods.scaleElementToParentSize(document.getElementById("content"), document.body); });
+            helperMethods.circuitBreaker(async ()=>{
 
-        },[5*1000, 10*1000, 30*1000, 2*60*1000, 5*60*1000, 5*60*1000, 10*60*1000], true,
-        (retry, err)=>{
-            // On each error
-            console.log("Weater Service Circuit Breaker: "+ retry+ ", "+ err.message);
-        }).then(()=>{
-            // On success
-            console.log("Weater Service sucessfully updated");
-
-            // try again after timeout
-            console.log("Refresh Weather content in " + updateEveryXSeconds + " seconds.");
-            window.setTimeout(()=>{
+                //Load actual weather data
+                let forecastData =  await weatherAPI.allInOneForecast(latitude, longitude, urlParameters.apiKey);
+                
+                // update Dom with the loaded data
+                displayWeather(forecastData).then(()=>{ helperMethods.scaleElementToParentSize(document.getElementById("content"), document.body); });
+    
+            },[5*1000, 10*1000, 30*1000, 2*60*1000, 5*60*1000, 5*60*1000, 10*60*1000], true,
+            (retry, err)=>{
+                // On each error
+                console.log("Weater Service Circuit Breaker: "+ retry+ ", "+ err.message);
+            }).then(()=>{
+                // On success
+                console.log("Weater Service sucessfully updated");
+                
+                // try again after timeout
                 refresh();
-            },updateEveryXSeconds*1000);
-        })
+            })
+
+        },updateEveryXSeconds*1000);
     }
 
-    
-
+    // trigger the coniniously refreshing loop
+    refresh();
     
 })();
 
