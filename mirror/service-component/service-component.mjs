@@ -36,6 +36,7 @@ export class ServiceComponent extends HTMLElement {
         shadow.append(body);
 
         body.appendChild(this.iframe);
+
     }
 
 
@@ -57,8 +58,13 @@ export class ServiceComponent extends HTMLElement {
         this.left = this.getAttribute("left") || (() => { throw new Error("'left' attribute missing.") })();
 
         // Set size to 0 until content loaded succesfuly
-        this.style.height = "0";
-        this.style.width = "0";
+        
+        this.style.position = "absolute";
+        this.iframe.style.borderWidth = "0";
+        this.style.height = 0;
+        this.style.width = 0;
+
+
 
         this.componentInitialized = true;
     }
@@ -80,6 +86,7 @@ export class ServiceComponent extends HTMLElement {
         this.style.height = this.height;
         this.style.width = this.width;
 
+        this.iframe.style.borderWidth = "1";
         setTimeout(()=>{
             this.iframe.style.borderWidth = "0";
         },10*1000);
@@ -133,8 +140,9 @@ export class ServiceComponent extends HTMLElement {
                 }
             }
 
+   
             // with setting the src attribute the iframe load the content
-            instance.iframe.src = urlWithParameter;
+            instance.iframe.src = urlWithParameter; // can throw an error message. Is not catchable (not interrupt the program)
         });
     }
 }
